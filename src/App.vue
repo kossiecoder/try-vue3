@@ -33,7 +33,7 @@
               :class="toDo.done ? 'task-completed' : ''"
               @click="openDetails(toDo)"
             >{{ toDo.text }}</div>
-            <button class="btn btn-danger btn-sm mr-1" @click="deleteToDo(toDo.createdAt)">Delete</button>
+            <button class="btn btn-danger btn-sm mr-1" @click="deleteToDoAndResetSelected(toDo.createdAt)">Delete</button>
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
         v-if="selected"
         class="border"
         :class="selected ? 'col-4' : 'd-none'"
-        style="height: 240px"
+        style="height: 200px"
       >
         <div class="d-flex align-items-center py-2">
           <span class="flex-grow-1 font-weight-bold">Todo Details</span>
@@ -62,7 +62,7 @@
         </div>
         <div class="d-flex">
           <div class="flex-grow-1"></div>
-          <button class="btn btn-danger" @click="deleteToDo(selected.createdAt)">Delete</button>
+          <button class="btn btn-danger" @click="deleteToDoAndResetSelected(selected.createdAt)">Delete</button>
         </div>
       </div>
     </div>
@@ -70,58 +70,85 @@
 </template>
 
 <script>
+import { useDetailCard } from '@/compositions/detail-card';
+import { useList } from '@/compositions/list';
+
 export default {
-  data() {
-    return {
-      text: "",
-      search: "",
-      toDoList: [],
-      selected: null
-    };
-  },
+  setup() {
+    const { text, search, filteredList, checkIfAlreadyExists, addToDo, toDoList, deleteToDo} = useList();
 
-  computed: {
-    checkIfAlreadyExists() {
-      return this.toDoList.some(toDo => toDo.text.trim() === this.text.trim());
-    },
+    const { selected, openDetails, closeDetails, resetSelected } = useDetailCard();
+    
+    const deleteToDoAndResetSelected = (createdAt) => {
+      deleteToDo(createdAt);
 
-    filteredList() {
-      return this.toDoList.filter(toDo => toDo.text.includes(this.search));
+      resetSelected(createdAt);
     }
-  },
 
-  methods: {
-    addToDo() {
-      if (!this.checkIfAlreadyExists) {
-        this.toDoList.push({
-          createdAt: new Date().getTime(),
-          done: false,
-          text: this.text
-        });
-        this.text = "";
-      }
-    },
-
-    deleteToDo(createdAt) {
-      const index = this.toDoList.findIndex(
-        toDo => toDo.createdAt === createdAt
-      );
-
-      this.toDoList.splice(index, 1);
-
-      if (createdAt === this.selected.createdAt) {
-        this.selected = null;
-      }
-    },
-
-    openDetails(selectedToDo) {
-      this.selected = selectedToDo;
-    },
-
-    closeDetails() {
-      this.selected = null;
+    return {
+      text,
+      search,
+      toDoList,
+      selected,
+      filteredList,
+      checkIfAlreadyExists,
+      addToDo,
+      openDetails,
+      closeDetails,
+      deleteToDoAndResetSelected
     }
   }
+  // data() {
+  //   return {
+  //     text: "",
+  //     search: "",
+  //     toDoList: [],
+  //     selected: null
+  //   };
+  // },
+
+  // computed: {
+  //   checkIfAlreadyExists() {
+  //     return this.toDoList.some(toDo => toDo.text.trim() === this.text.trim());
+  //   },
+
+  //   filteredList() {
+  //     return this.toDoList.filter(toDo => toDo.text.includes(this.search));
+  //   }
+  // },
+
+  // methods: {
+  //   addToDo() {
+  //     if (!this.checkIfAlreadyExists) {
+  //       this.toDoList.push({
+  //         createdAt: new Date().getTime(),
+  //         done: false,
+  //         text: this.text
+  //       });
+  //       this.text = "";
+  //     }
+  //   },
+
+  //   deleteToDo(createdAt) {
+  //     const index = this.toDoList.findIndex(
+  //       toDo => toDo.createdAt === createdAt
+  //     );
+
+  //     this.toDoList.splice(index, 1);
+
+  //     if (createdAt === this.selected.createdAt) {
+  //       this.selected = null;
+  //     }
+  //   },
+
+  //   openDetails(selectedToDo) {
+  //     this.selected = selectedToDo;
+  //   },
+
+  //   closeDetails() {
+  //     this.selected = null;
+  //   }
+  // }
 };
 </script>
 
