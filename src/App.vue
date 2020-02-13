@@ -109,7 +109,7 @@ export default {
 
       this.toDoList.splice(index, 1);
 
-      if (createdAt === this.selected.createdAt) {
+      if (this.selected && createdAt === this.selected.createdAt) {
         this.selected = null;
       }
     },
